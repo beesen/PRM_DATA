@@ -1,0 +1,65 @@
+[
+  {
+    "model": "data.itemtype",
+    "pk": 1,
+    "fields": {
+      "name": "Multiple-line free text question",
+      "has_options": false,
+      "has_statements": false
+    }
+  },
+  {
+    "model": "data.itemtype",
+    "pk": 2,
+    "fields": {
+      "name": "Multiple choice (single answer) question",
+      "has_options": true,
+      "has_statements": false
+    }
+  },
+  {
+    "model": "data.itemtype",
+    "pk": 3,
+    "fields": {
+      "name": "Multiple choice (multiple answers) question",
+      "has_options": true,
+      "has_statements": true
+    }
+  },
+  {
+    "model": "data.itemtype",
+    "pk": 4,
+    "fields": {
+      "name": "Single-line free text question",
+      "has_options": false,
+      "has_statements": false
+    }
+  },
+  {
+    "model": "data.itemtype",
+    "pk": 5,
+    "fields": {
+      "name": "Notes",
+      "has_options": false,
+      "has_statements": false
+    }
+  },
+  {
+    "model": "data.itemtype",
+    "pk": 6,
+    "fields": {
+      "name": "Scale/rank question",
+      "has_options": true,
+      "has_statements": true
+    }
+  },
+  {
+    "model": "data.itemtype",
+    "pk": 7,
+    "fields": {
+      "name": "Grid question",
+      "has_options": false,
+      "has_statements": false
+    }
+  }
+]
