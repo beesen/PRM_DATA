@@ -56,7 +56,10 @@ def fill_view(request: WSGIRequest):
 
         else:
             extra = f' Soort {vraag.soort_id} nog niet behandeld...'
-        opmerkingen.append(opmerking + extra)
+        try:
+            opmerkingen.append(opmerking + extra)
+        except:
+            print('Foutje bij vraag.volgnr...')
         j += 1
     context['opmerkingen'] = opmerkingen
     return render(request, template_name='pages/fill.html', context=context)

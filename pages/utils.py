@@ -85,8 +85,11 @@ def to_scale_rank(vraag):
     item_text = vraag.header
     if vraag.footer:
         msg = 'Ok - footer aanwezig'
+    else:
+        msg = 'Ok'
     item = Item.objects.create(seq_nr=vraag.volgnr, answer_type_id=answer_type_id,
                                item_type_id=item_type_id,
                                survey_id=survey_id, item_text=item_text)
     save_options(vraag, item)
     save_statements(vraag, item)
+    return msg
