@@ -1,20 +1,27 @@
 {% extends 'base.html' %}
 {% block content %}
-    Soorten:
-    <br>
-    {% for soort in soorten %}
-        {{ soort.id }} - {{ soort.naam }}<br>
-    {% endfor %}
-    <br>
-    <br>
-    Vragen:
-    {% for vraag in vragen %}
-        <p>{{ vraag.tekst }}</p>
-    {% endfor %}
-    <br>
-    <br>
-    Opmerkingen:
-    {% for opmerking in opmerkingen %}
-        <p>{{ opmerking }}</p>
-    {% endfor %}
+    <div>
+        Soorten:
+        <br>
+        {% for soort in soorten %}
+            {{ soort.id }} - {{ soort.naam }}<br>
+        {% endfor %}
+        <br>
+        <br>
+        Vragen:
+        {% for vraag in vragen %}
+            <p>{{ vraag.tekst }}</p>
+        {% endfor %}
+        <br>
+        <br>
+        Opmerkingen:
+        {% for opmerking in opmerkingen %}
+            <p>{{ opmerking }}</p>
+        {% endfor %}
+    </div>
+
+    {# The following lines should be last in this file #}
+    <script>
+        hideSpinner();
+    </script>
 {% endblock %}

@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import configparser
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,6 +27,34 @@ SECRET_KEY = 'django-insecure-#v=&c^uf&$(#w9@67!*0+4p4zeou1qv9@8u3v2b+#vpk(*u13^
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+# get settings from config.ini file
+config = configparser.ConfigParser(interpolation=None)
+config.read(f'{BASE_DIR}/config.ini')
+
+try:
+    local_config   = config['local']
+except KeyError as key_error:
+    print(f"No key found !! {key_error}")
+    sys.exit(-1)
+except TypeError as type_error:
+    print(f"No config.ini file found !! {type_error}")
+    sys.exit(-1)
+except configparser.Error as config_error:
+    print(f"{config_error}")
+    sys.exit(-1)
+
+# now translate them into django variables
+DEBUG          = local_config.getboolean('debug', False)
+SECRET_KEY     = local_config.get('secret')
+ALLOWED_HOSTS  = local_config.get('allowed_hosts', 'localhost').split(",")
+MAIL_SERVER    = local_config.get('mail_server', 'mailhost.uvt.nl')
+DEFAULT_DB     = local_config.get('default_db', 'postgres')
+USER = local_config.get('user')
+PW = local_config.get('pw')
+HOST = local_config.get('host')
+SERVICE_NAME = local_config.get('service_name')
+DO_NOT_BURN = local_config.getboolean('do_not_burn')
 
 
 # Application definition

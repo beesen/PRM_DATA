@@ -17,11 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 import debug_toolbar
 
-from pages.views import home_view, fill_view
+from pages.views import home_view
 
 urlpatterns = [
+    path('', home_view, name='home'),
     path('__debug__/', include(debug_toolbar.urls)),
     path('admin/', admin.site.urls),
-    path('', home_view, name='home'),
-    path('fill/', fill_view, name='fill'),
+    path('pages/', include('pages.urls')),
 ]

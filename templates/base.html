@@ -3,12 +3,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.css"
+          rel="stylesheet"
+          crossorigin="anonymous">
     <title>Title</title>
 </head>
 <body>
 {% include "nav.html" %}
-<hr>
-{% block content %}
-{% endblock %}
+<div class="container">
+    <!-- Content here -->
+    <div id="my_spinner" class="spinner-border d-none">
+    </div>
+    <script>
+        const spinner = document.getElementById('my_spinner');
+
+        function showSpinner() {
+            spinner.classList.remove('d-none');
+        }
+
+        function hideSpinner() {
+            spinner.classList.add('d-none');
+        }
+
+        document.addEventListener('click', function (event) {
+                // If the clicked element doesn't have the right selector, bail
+                if (!event.target.matches('.nav-link')) return;
+
+                // Log the clicked element in the console
+                console.log(event.target.className);
+
+                // Get all elements with class
+                const navLinks = document.querySelectorAll('.nav-link');
+                console.log(navLinks);
+
+                // Loop over all nav links and remove active
+                for (let i = 0; i < navLinks.length; i++) {
+                    navLinks[i].classList.remove('active');
+                }
+
+                // Set clicked nav link to active
+                event.target.classList.add('active');
+
+                // Don't follow the link
+                {#event.preventDefault();#}
+
+                // Makes spinner visible
+                showSpinner()
+            }
+        )
+    </script>
+    {% block content %}
+    {% endblock %}
+</div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
 </html>

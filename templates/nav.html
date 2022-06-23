@@ -1,2 +1,11 @@
-<a href="{% url 'home' %}">Home</a>
-<a href="{% url 'fill' %}">Fill PRM tables</a>
+<nav class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" href="{% url 'home' %}">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'pages:import_data' %}">Import</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'pages:fill' %}">Fill</a>
+    </li>
+</nav>
