@@ -35,15 +35,27 @@ def show_aggr(sqlite_cur):
 
 
 def import_data():
-    if settings.DO_NOT_BURN:
+    if settings.DO_NOT_IMPORT:
         return
+    survey_id = settings.SURVEY_ID
+
     # Connect to Oracle: user, pwd, hostname/servicename
     user = settings.USER
     pw = settings.PW
     host = settings.HOST
     service_name = settings.SERVICE_NAME
-    ora_con = cx_Oracle.connect(user, pw, f'{host}/{service_name}')
+    try:
+        ora_con = cx_Oracle.connect(user, pw, f'{host}/{service_name}')
+    except Exception as e:
+        print(e)
+        return
     ora_cur = ora_con.cursor()
+
+    # Now update survey_id form import
+    sql = f'update tbl_surveys set id={survey_id}'
+    ora_cur.execute(sql)
+    ora_con.commit()
+    print(f'\nImporting data for survey "{survey_id}"...')
 
     for pair in pairs:
         start_time = time.time()
@@ -56,6 +68,8 @@ def import_data():
         for row in ora_cur.execute(sql):
             n_recs = row[0]
             print(f'\n{pair[1]}: {n_recs} records')
+            if n_recs == 0:
+                return
 
         # initialize bar
         bf = "{percentage:3.0f}%|{bar:80}| {n_fmt}/{total_fmt} {elapsed}"
@@ -95,4 +109,4 @@ def import_data():
             #     show_aggr(sqlite_cur)
 
             elapsed_secs = time.time() - start_time
-            print(f' Elapsed time {elapsed_secs:.2f} seconds')
+            print(f'\nElapsed time {elapsed_secs:.2f} seconds')

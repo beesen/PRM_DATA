@@ -29,10 +29,19 @@ def to_multi_line_free_text(vraag):
 def to_single_line_free_text(vraag, answer_type_id):
     item_type_id = 4
     survey_id = get_survey_id(vraag.lijst_id)
+    if vraag.tekst:
+        item_text = vraag.tekst
+        msg = 'Ok'
+    else:
+        item_text = ''
+        msg = 'Ok - geen tekst'
+    if vraag.header:
+        item_text = item_text + vraag.header
+        msg = 'Ok - header aanwezig'
     item = Item.objects.create(seq_nr=vraag.volgnr, answer_type_id=answer_type_id,
                                item_type_id=item_type_id,
-                               survey_id=survey_id, item_text=vraag.tekst)
-    return 'Ok'
+                               survey_id=survey_id, item_text=item_text)
+    return msg
 
 
 def to_notes(vraag):
@@ -82,7 +91,11 @@ def to_scale_rank(vraag):
     answer_type_id = 2
     item_type_id = 6
     survey_id = get_survey_id(vraag.lijst_id)
-    item_text = vraag.header
+    if vraag.header:
+        item_text = vraag.header
+    else:
+        msg = 'Ok - geen header aanwezig'
+        item_text = ' '
     if vraag.footer:
         msg = 'Ok - footer aanwezig'
     else:

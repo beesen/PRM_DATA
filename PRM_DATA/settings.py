@@ -16,7 +16,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -33,7 +32,7 @@ config = configparser.ConfigParser(interpolation=None)
 config.read(f'{BASE_DIR}/config.ini')
 
 try:
-    local_config   = config['local']
+    local_config = config['local']
 except KeyError as key_error:
     print(f"No key found !! {key_error}")
     sys.exit(-1)
@@ -45,17 +44,17 @@ except configparser.Error as config_error:
     sys.exit(-1)
 
 # now translate them into django variables
-DEBUG          = local_config.getboolean('debug', False)
-SECRET_KEY     = local_config.get('secret')
-ALLOWED_HOSTS  = local_config.get('allowed_hosts', 'localhost').split(",")
-MAIL_SERVER    = local_config.get('mail_server', 'mailhost.uvt.nl')
-DEFAULT_DB     = local_config.get('default_db', 'postgres')
+DEBUG = local_config.getboolean('debug', False)
+SECRET_KEY = local_config.get('secret')
+ALLOWED_HOSTS = local_config.get('allowed_hosts', 'localhost').split(",")
+MAIL_SERVER = local_config.get('mail_server', 'mailhost.uvt.nl')
+DEFAULT_DB = local_config.get('default_db', 'postgres')
 USER = local_config.get('user')
 PW = local_config.get('pw')
 HOST = local_config.get('host')
 SERVICE_NAME = local_config.get('service_name')
-DO_NOT_BURN = local_config.getboolean('do_not_burn')
-
+DO_NOT_IMPORT = local_config.getboolean('do_not_import')
+SURVEY_ID = local_config.get('survey_id')
 
 # Application definition
 
@@ -88,8 +87,7 @@ ROOT_URLCONF = 'PRM_DATA.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -104,7 +102,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PRM_DATA.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -118,7 +115,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'question.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -138,7 +134,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -150,11 +145,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = (BASE_DIR, 'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

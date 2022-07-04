@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
     <div>
+        Vragenlijst: {{ lijst }}
+        <br>
+        <br>
         Soorten:
         <br>
         {% for soort in soorten %}
@@ -16,7 +19,7 @@
         <br>
         Opmerkingen:
         {% for opmerking in opmerkingen %}
-            <p>{{ opmerking }}</p>
+            <p>{{ opmerking|safe }}</p>
         {% endfor %}
     </div>
 
