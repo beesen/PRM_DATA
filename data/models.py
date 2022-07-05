@@ -26,13 +26,19 @@ class AnswerType(models.Model):
 
 
 class Item(models.Model):
+    # TODO: remove survey when routing is ready
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     item_type = models.ForeignKey(ItemType, on_delete=models.CASCADE)
     answer_type = models.ForeignKey(AnswerType, on_delete=models.CASCADE)
+    # TODO: remove seq_nr when routing is ready
     seq_nr = models.IntegerField()
     item_text = models.TextField(max_length=4000)
     display_direction = models.CharField(max_length=10, null=True, blank=True)
     add_text_box_other = models.BooleanField(default=False)
+    # TODO: remove page_nr when routing is ready
+    page_nr = models.IntegerField()
+    # TODO: remove next_page when routing is ready
+    next_page = models.IntegerField()
 
     class Meta:
         db_table = 'items'
@@ -42,6 +48,8 @@ class ItemOption(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     seq_nr = models.IntegerField()
     option_text = models.CharField(max_length=256)
+    # TODO: remove next_page when routing is ready
+    next_page = models.IntegerField()
 
     class Meta:
         db_table = 'item_options'

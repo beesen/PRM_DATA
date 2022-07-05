@@ -19,7 +19,7 @@ pairs = [
      ('vraag', 'prm_vw_vraag', QST),
      ('soort', 'prm_vw_soort', QST),
      ('respondent', 'prm_vw_respondent', QST),
-     # ('spss_data', 'prm_vw_spss_data', QST)
+     ('spss_data', 'prm_vw_spss_data', QST)
 ]
 def do_insert(sqlite_cur, table, cols_string, quest_string, ora_row):
     sql = f'''insert into {table} ({cols_string}) values ({quest_string})'''
@@ -51,11 +51,7 @@ def import_data():
         return
     ora_cur = ora_con.cursor()
 
-    # Now update survey_id form import
-    sql = f'update tbl_surveys set id={survey_id}'
-    ora_cur.execute(sql)
-    ora_con.commit()
-    print(f'\nImporting data for survey "{survey_id}"...')
+    print(f'\nImporting data for all surveys...')
 
     for pair in pairs:
         start_time = time.time()
@@ -75,38 +71,37 @@ def import_data():
         bf = "{percentage:3.0f}%|{bar:80}| {n_fmt}/{total_fmt} {elapsed}"
         pbar = tqdm(total=n_recs, ncols=140, bar_format=bf)
 
-        if 1 == 1:
-            # Empty table
-            sql = f'delete from {pair[0]}'
-            sqlite_cur.execute(sql)
-            sqlite_con.commit()
+        # Empty table
+        sql = f'delete from {pair[0]}'
+        sqlite_cur.execute(sql)
+        sqlite_con.commit()
 
-            # Prepare columns string
-            sql = f'select * from {pair[0]}'
-            sqlite_cur.execute(sql)
+        # Prepare columns string
+        sql = f'select * from {pair[0]}'
+        sqlite_cur.execute(sql)
 
-            cols = []
-            for column in sqlite_cur.description:
-                cols.append(column[0])
-            cols_as_string = ','.join(cols).lower()
+        cols = []
+        for column in sqlite_cur.description:
+            cols.append(column[0])
+        cols_as_string = ','.join(cols).lower()
 
-            # Prepare question string
-            quest = '?,'
-            quest_as_string = (quest * len(cols))[:-1]
+        # Prepare question string
+        quest = '?,'
+        quest_as_string = (quest * len(cols))[:-1]
 
-            # Get data
-            sql = f'select * from {pair[1]}'
-            ora_cur.execute(sql)
+        # Get data
+        sql = f'select * from {pair[1]}'
+        ora_cur.execute(sql)
 
-            # Process data => insert into local database
-            for row in ora_cur.execute(sql):
-                do_insert(sqlite_con, pair[0], cols_as_string, quest_as_string, row)
-                pbar.update(1)
-            sqlite_con.commit()
-            pbar.close()
+        # Process data => insert into local database
+        for row in ora_cur.execute(sql):
+            do_insert(sqlite_con, pair[0], cols_as_string, quest_as_string, row)
+            pbar.update(1)
+        sqlite_con.commit()
+        pbar.close()
 
-            # if pair[0]=='crf_spss_data':
-            #     show_aggr(sqlite_cur)
+        # if pair[0]=='crf_spss_data':
+        #     show_aggr(sqlite_cur)
 
-            elapsed_secs = time.time() - start_time
-            print(f'\nElapsed time {elapsed_secs:.2f} seconds')
+        elapsed_secs = time.time() - start_time
+        print(f'\nElapsed time {elapsed_secs:.2f} seconds')

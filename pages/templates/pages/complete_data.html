@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        {% for opmerking in opmerkingen %}
+            <p>{{ opmerking|safe }}</p>
+        {% endfor %}
+    </div>
+
+    {# The following lines should be last in this file #}
+    <script>
+        hideSpinner()
+    </script>
+{% endblock %}
+

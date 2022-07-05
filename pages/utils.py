@@ -22,7 +22,8 @@ def to_multi_line_free_text(vraag):
     survey_id = get_survey_id(vraag.lijst_id)
     item = Item.objects.create(seq_nr=vraag.volgnr, answer_type_id=answer_type_id,
                                item_type_id=item_type_id,
-                               survey_id=survey_id, item_text=vraag.tekst)
+                               survey_id=survey_id, item_text=vraag.tekst,
+                               page_nr=vraag.volgnr, next_page=vraag.vervolg)
     return 'Ok'
 
 
@@ -40,7 +41,8 @@ def to_single_line_free_text(vraag, answer_type_id):
         msg = 'Ok - header aanwezig'
     item = Item.objects.create(seq_nr=vraag.volgnr, answer_type_id=answer_type_id,
                                item_type_id=item_type_id,
-                               survey_id=survey_id, item_text=item_text)
+                               survey_id=survey_id, item_text=item_text,
+                               page_nr=vraag.volgnr, next_page=vraag.vervolg)
     return msg
 
 
@@ -50,7 +52,8 @@ def to_notes(vraag):
     survey_id = get_survey_id(vraag.lijst_id)
     item = Item.objects.create(seq_nr=vraag.volgnr, answer_type_id=answer_type_id,
                                item_type_id=item_type_id,
-                               survey_id=survey_id, item_text=vraag.tekst)
+                               survey_id=survey_id, item_text=vraag.tekst,
+                               page_nr=vraag.volgnr, next_page=vraag.vervolg)
     return 'Ok'
 
 
@@ -69,17 +72,25 @@ def to_multiple_choice_single_answer(vraag, display_direction, add_text_box_othe
         msg = 'Ok - header aanwezig'
     item = Item.objects.create(seq_nr=vraag.volgnr, answer_type_id=answer_type_id,
                                item_type_id=item_type_id,
-                               survey_id=survey_id, item_text=item_text)
+                               survey_id=survey_id, item_text=item_text,
+                               page_nr=vraag.volgnr, next_page=-1)
+    save_options(vraag, item)
     return msg
 
 
 # Save options for this item
 def save_options(vraag, item):
     nr_of_options = count_options(vraag)
+    option_text = vraag.altern.split('|')
+    if len(option_text) != nr_of_options:
+        raise Exception('Error in field "altern"')
+    next_page = vraag.vervolg.split('|')
+    if len(next_page) != nr_of_options:
+        raise Exception('Error in field "vervolg"')
     for n in range(nr_of_options):
-        option_text = vraag.altern.split('|')
         item_option = ItemOption.objects.create(
-            seq_nr=n, option_text=option_text, item_id=item.id)
+            seq_nr=n, option_text=option_text[n], item_id=item.id,
+            next_page=next_page[n])
 
 
 # Save statements for this item
@@ -102,7 +113,8 @@ def to_scale_rank(vraag):
         msg = 'Ok'
     item = Item.objects.create(seq_nr=vraag.volgnr, answer_type_id=answer_type_id,
                                item_type_id=item_type_id,
-                               survey_id=survey_id, item_text=item_text)
+                               survey_id=survey_id, item_text=item_text,
+                               page_nr=vraag.volgnr, next_page=-1)
     save_options(vraag, item)
     save_statements(vraag, item)
     return msg

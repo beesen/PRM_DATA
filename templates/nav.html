@@ -2,9 +2,12 @@
     <a class="nav-link  {% if request.resolver_match.view_name == 'home' %}active{% endif %}"
        href="{% url 'home' %}">Home</a>
     <a class="nav-link
-       {% if request.resolver_match.view_name == 'pages:import_data' %}active{% endif %}"
-       href="{% url 'pages:import_data' %}">Import</a>
+       {% if request.resolver_match.view_name == 'pages:complete_data' %}active{% endif %}"
+       href="{% url 'pages:complete_data' %}">Complete</a>
     <a class="nav-link
        {% if request.resolver_match.view_name == 'pages:fill' %}active{% endif %}"
        href="{% url 'pages:fill' %}">Fill</a>
+    <a class="nav-link
+       {% if request.resolver_match.view_name == 'pages:import_data' %}active{% endif %}"
+       href="{% url 'pages:import_data' %}">Import</a>
 </nav>
