@@ -85,8 +85,13 @@ def save_options(vraag, item):
     if len(option_text) != nr_of_options:
         raise Exception('Error in field "altern"')
     next_page = vraag.vervolg.split('|')
-    if len(next_page) != nr_of_options:
-        raise Exception('Error in field "vervolg"')
+    if len(next_page) == 1:
+        # Herhaal x keer
+        for n in range(nr_of_options-1):
+            next_page.append(next_page[0])
+    else:
+        if len(next_page) != nr_of_options:
+            raise Exception('Error in field "vervolg"')
     for n in range(nr_of_options):
         item_option = ItemOption.objects.create(
             seq_nr=n, option_text=option_text[n], item_id=item.id,
