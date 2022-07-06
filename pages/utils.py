@@ -1,4 +1,5 @@
-from data.models import Item, Survey, ItemOption
+import re
+from data.models import Item, Survey, ItemOption, ItemStatement
 
 
 def get_survey_id(lijst_id):
@@ -14,6 +15,17 @@ def count_statements(vraag):
 # Return nr of options found
 def count_options(vraag):
     return vraag.altern.count('|') + 1
+
+# returns a new string after removing any leading and trailing whitespaces
+# including tabs (\t) and new lines (\n)
+def trim(str):
+    help = str.strip()
+    help.strip('\n')
+    # Remove HTML tags
+    if '<' in help:
+        clean = re.compile('<.*?>')
+        help = re.sub(clean, '', help)
+    return help
 
 
 def to_multi_line_free_text(vraag):
@@ -94,14 +106,18 @@ def save_options(vraag, item):
             raise Exception('Error in field "vervolg"')
     for n in range(nr_of_options):
         item_option = ItemOption.objects.create(
-            seq_nr=n, option_text=option_text[n], item_id=item.id,
-            next_page=next_page[n])
+            seq_nr=n, option_text=trim(option_text[n]), item_id=item.id,
+            next_page=trim(next_page[n]))
 
 
 # Save statements for this item
 def save_statements(vraag, item):
-    None
-
+    nr_of_statements = count_statements(vraag)
+    statement_text = vraag.tekst.split('|')
+    for n in range(nr_of_statements):
+        text = trim(statement_text[n])
+        item_statement = ItemStatement.objects.create(
+            seq_nr=n, statement_text=text, item_id=item.id)
 
 def to_scale_rank(vraag):
     answer_type_id = 2

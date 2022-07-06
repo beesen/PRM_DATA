@@ -42,15 +42,15 @@ def fill():
                 extra = to_single_line_free_text(vraag, 1)
             elif vraag.soort_id == 8:  # MEDEDELING ( < 4000)
                 extra = to_notes(vraag)
-            elif vraag.soort_id == 9:  # OPEN ANSWER (1 LINE, HORIZONTAL)
+            elif vraag.soort_id == 9:  #  NUMERICAL (1 LINE, HORIZONTAL)
                 extra = to_single_line_free_text(vraag, 2)
-            # elif vraag.soort_id == 15:  # MATRIX RADIO INPUT
-            #     nr_of_statements = count_statements(vraag)
-            #     if nr_of_statements == 1:
-            #         extra = to_multiple_choice_single_answer(vraag, 'horizontal', False)
-            #         extra = extra + ' vraagtype gewijzigd naar "Multiple choice single answer"'
-            #     else:
-            #         extra = to_scale_rank(vraag)
+            elif vraag.soort_id == 15:  # MATRIX RADIO INPUT
+                nr_of_statements = count_statements(vraag)
+                if nr_of_statements == 1:
+                    extra = to_multiple_choice_single_answer(vraag, 'horizontal', False)
+                    extra = extra + ' vraagtype gewijzigd naar "Multiple choice single answer"'
+                else:
+                    extra = to_scale_rank(vraag)
             elif vraag.soort_id == 21:  # MULTIPLE QUESTION (VERTICAL)
                 nr_of_statements = count_statements(vraag)
                 if nr_of_statements == 1:
@@ -58,6 +58,8 @@ def fill():
                     extra = extra + ' vraagtype gewijzigd naar "Multiple choice single answer"'
                 else:
                     extra = f' Soort {vraag.soort_id} nog niet behandeld...'
+            elif vraag.soort_id == 36:  # MULTI OPEN ANSWER (1 LINE, HORIZONTAL)
+                extra = to_single_line_free_text(vraag, 2)
             elif vraag.soort_id == 37:  # DATE INPUT (NO POPUP)
                 extra = to_single_line_free_text(vraag, 3)
             else:
