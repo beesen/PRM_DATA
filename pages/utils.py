@@ -16,15 +16,32 @@ def count_statements(vraag):
 def count_options(vraag):
     return vraag.altern.count('|') + 1
 
-# returns a new string after removing any leading and trailing whitespaces
-# including tabs (\t) and new lines (\n)
-def trim(str):
-    help = str.strip()
-    help.strip('\n')
-    # Remove HTML tags
-    if '<' in help:
-        clean = re.compile('<.*?>')
-        help = re.sub(clean, '', help)
+
+# returns a new string after removing
+# HTML tags
+# leading, trailing whitespaces,
+# new lines (\n) and tabs (\t)
+# and series of characters at beginning of string (12a.)
+def clean_str(str):
+    if '<' in str:
+        # Remove HTML tags <>
+        pattern = r'<.*?>'
+        flags = re.DOTALL + re.MULTILINE
+        clean = re.compile(pattern, flags)
+        help = re.sub(clean, '', str)
+    else:
+        help = str
+    help = help.strip()
+    # Remove LF
+    help = help.replace('\n', '')
+    # Remove TAB
+    help = help.replace('\t', '')
+    if help[0].isdigit():
+        # Remove digit(s) and dot at beginning
+        pattern = r'^\d+[a-zA-Z]*\.?'
+        clean_str = re.compile(pattern)
+        help = re.sub(clean_str, '', help)
+        help = help.strip()
     return help
 
 
@@ -96,28 +113,30 @@ def save_options(vraag, item):
     option_text = vraag.altern.split('|')
     if len(option_text) != nr_of_options:
         raise Exception('Error in field "altern"')
-    next_page = vraag.vervolg.split('|')
-    if len(next_page) == 1:
+    next_pages = vraag.vervolg.split('|')
+    if len(next_pages) == 1:
         # Herhaal x keer
-        for n in range(nr_of_options-1):
-            next_page.append(next_page[0])
+        for n in range(nr_of_options - 1):
+            next_pages.append(next_pages[0])
     else:
-        if len(next_page) != nr_of_options:
+        if len(next_pages) != nr_of_options:
             raise Exception('Error in field "vervolg"')
     for n in range(nr_of_options):
+        next_page = next_pages[n].strip()
         item_option = ItemOption.objects.create(
-            seq_nr=n, option_text=trim(option_text[n]), item_id=item.id,
-            next_page=trim(next_page[n]))
+            seq_nr=n + 1, option_text=clean_str(option_text[n]), item_id=item.id,
+            next_page=next_page)
 
 
 # Save statements for this item
 def save_statements(vraag, item):
     nr_of_statements = count_statements(vraag)
-    statement_text = vraag.tekst.split('|')
+    statement_texts = vraag.tekst.split('|')
     for n in range(nr_of_statements):
-        text = trim(statement_text[n])
+        text = clean_str(statement_texts[n])
         item_statement = ItemStatement.objects.create(
-            seq_nr=n, statement_text=text, item_id=item.id)
+            seq_nr=n + 1, statement_text=text, item_id=item.id)
+
 
 def to_scale_rank(vraag):
     answer_type_id = 2
