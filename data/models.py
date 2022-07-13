@@ -39,6 +39,10 @@ class Item(models.Model):
     page_nr = models.IntegerField()
     # TODO: remove next_page when routing is ready
     next_page = models.IntegerField()
+    spss_variable = models.CharField(max_length=32)
+    spss_variable_label = models.CharField(max_length=256)
+    spss_missing_value = models.CharField(max_length=16)
+    spss_format = models.CharField(max_length=16)
 
     class Meta:
         db_table = 'items'
@@ -50,6 +54,7 @@ class ItemOption(models.Model):
     option_text = models.CharField(max_length=256)
     # TODO: remove next_page when routing is ready
     next_page = models.IntegerField()
+    spss_value_label = models.CharField(max_length=256)
 
     class Meta:
         db_table = 'item_options'
@@ -59,6 +64,10 @@ class ItemStatement(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     seq_nr = models.IntegerField()
     statement_text = models.CharField(max_length=256)
+    spss_variable = models.CharField(max_length=32)
+    spss_variable_label = models.CharField(max_length=256)
+    spss_missing_value = models.CharField(max_length=16)
+    spss_format = models.CharField(max_length=16)
 
     class Meta:
         db_table = 'item_statements'

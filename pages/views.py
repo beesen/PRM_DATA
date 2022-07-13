@@ -4,6 +4,7 @@ from django.shortcuts import render
 from pages.complete_data import complete_data
 from pages.fill import fill
 from pages.import_data import import_data
+from pages.show_items import show_items
 
 
 def home_view(request: WSGIRequest):
@@ -24,3 +25,8 @@ def import_data_view(request: WSGIRequest):
 def complete_data_view(request: WSGIRequest):
     context = complete_data()
     return render(request, template_name='pages/complete_data.html', context=context)
+
+
+def show_items_view(request: WSGIRequest):
+    context = show_items()
+    return render(request, template_name='pages/show_items.html', context=context)

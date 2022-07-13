@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h3>Survey {{ survey.name }} contains {{ items.count }} items </h3>
+    ITEM: Seq nr / Item type / Item ID<br>
+    SPSS: variable | variable_label | missing_value | format<br>
+    VALUE_LABELS: not always necessary
+    <hr>
+    {% for item in items %}
+        <div class="item-hdr">ITEM: {{ item.seq_nr }} / {{ item.item_type.name }}
+            / {{ item.id }}<br>
+            {% if not item.item_type.has_statements %}
+                SPSS: {{ item.spss_variable }}
+                | {{ item.spss_variable_label }} | {{ item.spss_missing_value }} |
+                {{ item.spss_format }}<br>
+            {% else %}
+                {% for item_statement in item.itemstatement_set.all %}
+                    SPSS: {{ item_statement.spss_variable }}
+                    | {{ item_statement.spss_variable_label }} |
+                    {{ item_statement.spss_missing_value }} |
+                    {{ item_statement.spss_format }}
+                    <br>
+                {% endfor %}
+            {% endif %}
+            {% if item.item_type.has_options %}
+                VALUE_LABELS:
+                {% for item_option in item.itemoption_set.all %}
+                    {{ item_option.spss_value_label }}
+                    {% if forloop.counter < item.itemoption_set.count %} #
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="item-input">
+            {{ item.item_text|safe }}<br>
+            {% if item.item_type_id == 1 %}
+                <textarea name="item_{{ item.id }}"></textarea>
+            {% elif item.item_type_id == 2 %}
+                {% for item_option in item.itemoption_set.all %}
+                    <input type="radio"
+                           id="n_{{ item.seq_nr }}_{{ item_option.seq_nr }}"
+                           name="item_{{ item.id }}"
+                           value="{{ item_option.seq_nr }}">
+                    <label for="n_{{ item.seq_nr }}_{{ item_option.seq_nr }}">{{ item_option.option_text }}</label>
+                    {% if item.display_direction == 'vertical' %}
+                        <br>
+                    {% endif %}
+                {% endfor %}
+                {% if item.add_text_box_other %}
+                    <input type="radio"
+                           id="n_{{ item.seq_nr }}_{{ item.itemoption_set.count|add:"1" }}"
+                           name="item_{{ item.id }}"
+                           value="{{ item.itemoption_set.count|add:"1" }}">
+                    <label for="n_{{ item.seq_nr }}_{{ item.itemoption_set.count|add:"1" }}">Other</label>
+                    <input type="text" name="item_{{ item.id }}_2">
+                {% endif %}
+            {% elif item.item_type_id == 3 %}
+                {% for item_option in item.itemoption_set.all %}
+                    <input type="checkbox"
+                           id="n_{{ item.seq_nr }}_{{ item_option.seq_nr }}"
+                           name="item_{{ item.id }}"
+                           value="{{ item_option.seq_nr }}">
+                    <label for="n_{{ item.seq_nr }}_{{ item_option.seq_nr }}">{{ item_option.option_text }}</label>
+                    {% if item.display_direction == 'vertical' %}
+                        <br>
+                    {% endif %}
+                {% endfor %}
+            {% elif item.item_type_id == 4 %}
+                {% if item.answer_type_id == 1 %}
+                    <input type="text" name="item_{{ item.id }}">
+                {% elif item.answer_type_id == 2 %}
+                    <input type="number"
+                           name="n_{{ item.survey_id }}_{{ item.seq_nr }}">
+                {% elif item.answer_type_id == 3 %}
+                    <input type="date" name="item_{{ item.id }}">
+                {% endif %}
+            {% elif item.item_type_id == 5 %}
+                {# just a note:) #}
+            {% elif item.item_type_id == 6 %}
+                <table>
+                    <tr>
+                        <td></td>
+                        {% for item_option in item.itemoption_set.all %}
+                            <th>{{ item_option.option_text }}</th>
+                        {% endfor %}
+                    </tr>
+                    {% for item_statement in item.itemstatement_set.all %}
+                        <tr>
+                            <td>{{ item_statement.statement_text }}</td>
+                            {% for item_option in item.itemoption_set.all %}
+                                <td><input type="radio"
+                                           name="statement_{{ item_statement.id }}">
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% elif item.item_type_id == 7 %}
+                <div style="color:red">Nog niet geimplementeerd!</div>
+            {% endif %}
+        </div>
+        <hr>
+    {% endfor %}
+    {# The following lines should be last in this file #}
+    <script>
+        hideSpinner()
+    </script>
+    <style>
+        .item-hdr {
+            font-size: small;
+        }
+        .item-input {
+            background-color: skyblue;
+            padding: 6px;
+        }
+    </style>
+{% endblock %}

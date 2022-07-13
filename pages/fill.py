@@ -3,7 +3,8 @@ from django.conf import settings
 
 from data.models import Item, Survey
 from pages.utils import to_multi_line_free_text, to_multiple_choice_single_answer, \
-    to_single_line_free_text, to_notes, count_statements, to_scale_rank, get_survey_id
+    to_single_line_free_text, to_notes, count_statements, to_scale_rank, get_survey_id, \
+    to_multiple_choice_multiple_answer
 from question.models import Soort, Vraag
 
 
@@ -18,6 +19,7 @@ def fill():
     id = get_survey_id(lijst_id=lijst_id)
     context['lijst'] = Survey.objects.get(id=id).name
     vragen = Vraag.objects.using('npm').filter(lijst_id=lijst_id).order_by('volgnr')
+    # vragen = vragen.filter(volgnr=44)
     # Let op: "vragen" NIET gebruiken, vanwege de order by!
     soorten = Vraag.objects.using('npm').all().values_list('soort_id',
                                                            flat=True).distinct()
@@ -33,16 +35,19 @@ def fill():
             elif vraag.soort_id == 2:  # MULTIPLE CHOICE, RADIO BUTTONS (VERTICAL)
                 extra = to_multiple_choice_single_answer(vraag, 'vertical', False)
             elif vraag.soort_id == 3:  # MULTIPLE CHOICE, RADIO BUTTONS (HORIZONTAL)
-                extra = to_multiple_choice_single_answer(vraag, 'horizontal', False)
-            # elif vraag.soort_id == 5:  # MULTIPLE CHOICE, CHECK BOXES (VERTICAL)
-            #     extra = ' Soort 5: nog doen'
+                if False and vraag.lijst_id == 2240 and vraag.volgnr == 3:
+                    extra = to_multiple_choice_single_answer(vraag, 'horizontal', True)
+                else:
+                    extra = to_multiple_choice_single_answer(vraag, 'horizontal', False)
+            elif vraag.soort_id == 5:  # MULTIPLE CHOICE, CHECK BOXES (VERTICAL)
+                extra = to_multiple_choice_multiple_answer(vraag, 'vertical', False)
             elif vraag.soort_id == 6:  # OPEN ANSWER (MEER REGELS, VERTICAL)
                 extra = to_multi_line_free_text(vraag)
             elif vraag.soort_id == 7:  # OPEN ANSWER (1 LINE, HORIZONTAL)
                 extra = to_single_line_free_text(vraag, 1)
             elif vraag.soort_id == 8:  # MEDEDELING ( < 4000)
                 extra = to_notes(vraag)
-            elif vraag.soort_id == 9:  #  NUMERICAL (1 LINE, HORIZONTAL)
+            elif vraag.soort_id == 9:  # NUMERICAL (1 LINE, HORIZONTAL)
                 extra = to_single_line_free_text(vraag, 2)
             elif vraag.soort_id == 15:  # MATRIX RADIO INPUT
                 nr_of_statements = count_statements(vraag)

@@ -32,26 +32,27 @@ def do_insert(sqlite_cur, table, cols_string, quest_string, ora_row):
     sqlite_cur.execute(sql, ora_row)
 
 
-def get_latest_date(cur, date_field, table):
-    sql = f'select max({date_field}) as max_date from {table}'
+def get_latest(cur, date_field, table):
+    sql = f'select max({date_field}) as max_date, count(1) as nr_records from {table}'
     for row in cur.execute(sql):
         max_date = row[0]
+        nr_records = row[1]
         # If date is string...
         if isinstance(max_date, str):
             max_date = datetime.strptime(max_date, '%Y-%m-%d %H:%M:%S')
-        return max_date
+        return max_date, nr_records
 
 
-def get_latest_date_local(cur, table):
-    return get_latest_date(cur, table["date_field"], table["local_table"])
+def get_latest_local(cur, table):
+    return get_latest(cur, table["date_field"], table["local_table"])
 
 
-def get_latest_date_oracle(cur, table):
-    return get_latest_date(cur, table["date_field"], table["oracle_table"])
+def get_latest_oracle(cur, table):
+    return get_latest(cur, table["date_field"], table["oracle_table"])
 
 
 # Append data from Oracle to local table
-# Let op! In spss_data hebben records soms hetzelfde tijdstip
+# TODO: In spss_data hebben records soms hetzelfde tijdstip
 def fetch_and_append_data(table, ora_cur, sqlite_con, latest_date_local):
     start_time = time.time()
 
@@ -119,10 +120,10 @@ def complete_data():
     for table in tables:
         sqlite_con = sqlite3.connect(table['database'])
         sqlite_cur = sqlite_con.cursor()
-        latest_date_oracle = get_latest_date_oracle(ora_cur, table)
-        latest_date_local = get_latest_date_local(sqlite_cur, table)
+        latest_date_oracle, latest_nr_records_oracle = get_latest_oracle(ora_cur, table)
+        latest_date_local, latest_nr_records_local = get_latest_local(sqlite_cur, table)
         # Do we need to fetch data and append?
-        if latest_date_oracle > latest_date_local:
+        if latest_nr_records_oracle > latest_nr_records_local:
             opmerkingen.append(f'Fetching data for "{table["local_table"]}"...')
             opmerkingen.append(
                 fetch_and_append_data(table, ora_cur, sqlite_con, latest_date_local))
