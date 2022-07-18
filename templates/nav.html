@@ -2,15 +2,15 @@
     <a class="nav-link  {% if request.resolver_match.view_name == 'home' %}active{% endif %}"
        href="{% url 'home' %}">Home</a>
     <a class="nav-link
-       {% if request.resolver_match.view_name == 'pages:show_items' %}active{% endif %}"
-       href="{% url 'pages:show_items' %}">Show items</a>
+       {% if request.resolver_match.view_name == 'pages:show_survey' %}active{% endif %}"
+       href="{% url 'pages:show_survey' %}">Show survey</a>
     <a class="nav-link
-       {% if request.resolver_match.view_name == 'pages:complete_data' %}active{% endif %}"
-       href="{% url 'pages:complete_data' %}">Complete</a>
+       {% if request.resolver_match.view_name == 'pages:convert' %}active{% endif %}"
+       href="{% url 'pages:convert' %}">Convert to survey</a>
     <a class="nav-link
-       {% if request.resolver_match.view_name == 'pages:fill' %}active{% endif %}"
-       href="{% url 'pages:fill' %}">Fill</a>
+       {% if request.resolver_match.view_name == 'pages:incremental_import' %}active{% endif %}"
+       href="{% url 'pages:incremental_import' %}">Incremental import</a>
     <a class="nav-link
        {% if request.resolver_match.view_name == 'pages:import_data' %}active{% endif %}"
-       href="{% url 'pages:import_data' %}">Import</a>
+       href="{% url 'pages:import_data' %}">Full import</a>
 </nav>

@@ -100,7 +100,7 @@ def fetch_and_append_data(table, ora_cur, sqlite_con, latest_date_local):
 
 # Complete the imported data only for respondents and spss_data
 # Check last date
-def complete_data():
+def incremental_import():
     # Connect to Oracle: user, pwd, hostname/servicename
     user = settings.USER
     pw = settings.PW

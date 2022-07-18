@@ -7,8 +7,21 @@ from pages.utils import to_multi_line_free_text, to_multiple_choice_single_answe
     to_multiple_choice_multiple_answer
 from question.models import Soort, Vraag
 
+# Check scores for soort_id=15
+def check_scores(vragen):
+    vragenx = vragen.filter(soort_id=15)
+    for vraagx in vragenx:
+        if vraagx.score:
+            scores = vraagx.score.split('#')
+            score0 = scores[0]
+            for s in range(2, len(scores)):
+                if scores[s] != score0:
+                    return False, f"{vraagx.lijst_id}, {vraagx.volgnr}"
+        else:
+            return False, f"{vraagx.lijst_id}, {vraagx.volgnr}"
+    return True, ''
 
-def fill():
+def convert():
     if settings.DO_NOT_IMPORT:
         return
     # Clean items
@@ -18,8 +31,14 @@ def fill():
     lijst_id = settings.SURVEY_ID
     id = get_survey_id(lijst_id=lijst_id)
     context['lijst'] = Survey.objects.get(id=id).name
-    vragen = Vraag.objects.using('npm').filter(lijst_id=lijst_id).order_by('volgnr')
-    # vragen = vragen.filter(volgnr=44)
+    vragen = Vraag.objects.using('npm').order_by('lijst_id', 'volgnr')
+    vragen = vragen.filter(lijst_id=lijst_id).order_by('volgnr')
+    ok, msg = check_scores(vragen)
+    if not ok:
+        context['opmerkingen'] = [f'<span style="color:red; font-weight:bold">Controleer de scores van soort_id 15 {msg}...</span>']
+        return context
+
+    # vragen = vragen.filter(volgnr=2)
     # Let op: "vragen" NIET gebruiken, vanwege de order by!
     soorten = Vraag.objects.using('npm').all().values_list('soort_id',
                                                            flat=True).distinct()
@@ -28,7 +47,7 @@ def fill():
     opmerkingen = []
     # Loop over alle soorten
     for vraag in vragen:
-        opmerking = f'Vraag {vraag.volgnr} / {vragen.count()} / {vraag.soort_id} - '
+        opmerking = f'Vraag {vraag.lijst_id} - {vraag.volgnr} / {vragen.count()} / {vraag.soort_id} - '
         try:
             if vraag.soort_id == 1:  # OPEN ANSWER (MORE LINES, HORIZONTAL)
                 extra = to_multi_line_free_text(vraag)

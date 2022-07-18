@@ -55,6 +55,7 @@ class ItemOption(models.Model):
     # TODO: remove next_page when routing is ready
     next_page = models.IntegerField()
     spss_value_label = models.CharField(max_length=256)
+    score = models.IntegerField()
 
     class Meta:
         db_table = 'item_options'

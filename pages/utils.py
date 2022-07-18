@@ -30,12 +30,18 @@ def clean_number(str: str):
     help = help.replace('\t', '')
     # Remove blank
     help = help.replace('&nbsp;', '')
-    if help[0].isdigit() and not help.isnumeric():
-        # Als er een punt zit aan begin van de string
-        # TODO: verfijnen?
-        if '.' in help[0:4]:
-            # Remove digit(s) and dot at beginning
-            pattern = r'^\d+[a-zA-Z]*\.{1}'
+    # Remove ellipsis
+    help = help.replace('&#8230;', '')
+    if help[0].isdigit():
+        if not help.isnumeric():
+            # Als er een punt zit aan begin van de string
+            # TODO: verfijnen?
+            if '.' in help[0:4]:
+                # Remove digit(s) and dot at beginning
+                pattern = r'^\d+[a-zA-Z]*\.{1}'
+            else:
+                # Remove digit(s) at beginning
+                pattern = r'^\d+'
         else:
             # Remove digit(s) at beginning
             pattern = r'^\d+'
@@ -170,11 +176,11 @@ def to_multiple_choice_single_answer(vraag: Vraag, display_direction: str,
 
 # Save options for this item
 def save_options(vraag: Vraag, item):
-    nr_of_options = count_options(vraag)
-    option_text = vraag.altern.split('|')
-    if len(option_text) != nr_of_options:
-        raise Exception('Error in field "altern"')
+    option_texts = vraag.altern.split('|')
+    nr_of_options = len(option_texts)
     next_pages = vraag.vervolg.split('|')
+    scores = vraag.score.split('#')
+    scores = scores[0].split('|')
     if len(next_pages) == 1:
         # Herhaal x keer
         for n in range(nr_of_options - 1):
@@ -184,17 +190,18 @@ def save_options(vraag: Vraag, item):
             raise Exception('Error in field "vervolg"')
     for n in range(nr_of_options):
         next_page = next_pages[n].strip()
-        text = clean_str(option_text[n])
+        text = clean_str(option_texts[n])
+        score = scores[n]
         item_option = ItemOption.objects.create(
             seq_nr=n + 1, option_text=text, item_id=item.id,
             next_page=next_page,
-            spss_value_label=text)
+            spss_value_label=text, score=score)
 
 
 # Save statements for this item
 def save_statements(vraag: Vraag, item):
-    nr_of_statements = count_statements(vraag)
     statement_texts = vraag.tekst.split('|')
+    nr_of_statements = len(statement_texts)
     spss_variables = vraag.spss_variabele.split('#')
     spss_variable_labels = vraag.spss_label.split('#')
     for n in range(nr_of_statements):
@@ -233,6 +240,25 @@ def to_multiple_choice_multiple_answer(vraag: Vraag, display_direction: str,
                                display_direction=display_direction,
                                add_text_box_other=add_text_box_other,
                                page_nr=vraag.volgnr, next_page=-1)
+    # Behandel dit als een scale_rank item:
+    # var 1 # ja | nee
+    # var 2 # ja | nee
+    # herschik sommige variabelen
+
+    # In altern staan de opties, dit moeten eigenlijk statements worden
+    # SPSS_VARIABELE moet worden herhaald: net zoveel keer als er statements zijn
+    vraag.tekst = vraag.altern
+    nr_of_statements = count_statements(vraag)
+    spss_variable = f"{vraag.spss_variabele}_1"
+    for n in range(1, nr_of_statements):
+        spss_variable = spss_variable + f"#{vraag.spss_variabele}_{n + 1}"
+    vraag.spss_variabele = spss_variable
+    vraag.spss_label = vraag.altern.replace('|', '#')
+    save_statements(vraag, item)
+
+    # Maak zelf opties
+    vraag.altern = 'Y|N'
+    vraag.score = '0|1'
     save_options(vraag, item)
     return msg
 

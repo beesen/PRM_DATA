@@ -6,7 +6,8 @@
     VALUE_LABELS: not always necessary
     <hr>
     {% for item in items %}
-        <div class="item-hdr">ITEM: {{ item.seq_nr }} / {{ item.item_type.name }}
+        <div class="item-info">ITEM: {{ item.seq_nr }} / {{ item.item_type.name }}
+            ({{ item.item_type_id }})
             / {{ item.id }}<br>
             {% if not item.item_type.has_statements %}
                 SPSS: {{ item.spss_variable }}
@@ -25,6 +26,13 @@
                 VALUE_LABELS:
                 {% for item_option in item.itemoption_set.all %}
                     {{ item_option.spss_value_label }}
+                    {% if forloop.counter < item.itemoption_set.count %} #
+                    {% endif %}
+                {% endfor %}
+                <br>
+                SCORES:
+                {% for item_option in item.itemoption_set.all %}
+                    {{ item_option.score }}
                     {% if forloop.counter < item.itemoption_set.count %} #
                     {% endif %}
                 {% endfor %}
@@ -54,12 +62,12 @@
                     <input type="text" name="item_{{ item.id }}_2">
                 {% endif %}
             {% elif item.item_type_id == 3 %}
-                {% for item_option in item.itemoption_set.all %}
+                {% for item_statetement in item.itemstatement_set.all %}
                     <input type="checkbox"
-                           id="n_{{ item.seq_nr }}_{{ item_option.seq_nr }}"
+                           id="n_{{ item.seq_nr }}_{{ item_statetement.seq_nr }}"
                            name="item_{{ item.id }}"
-                           value="{{ item_option.seq_nr }}">
-                    <label for="n_{{ item.seq_nr }}_{{ item_option.seq_nr }}">{{ item_option.option_text }}</label>
+                           value="{{ item_statetement.seq_nr }}">
+                    <label for="n_{{ item.seq_nr }}_{{ item_statetement.seq_nr }}">{{ item_statetement.statement_text }}</label>
                     {% if item.display_direction == 'vertical' %}
                         <br>
                     {% endif %}
@@ -80,14 +88,14 @@
                     <tr>
                         <td></td>
                         {% for item_option in item.itemoption_set.all %}
-                            <th>{{ item_option.option_text }}</th>
+                            <th style="text-align: center">{{ item_option.option_text }}</th>
                         {% endfor %}
                     </tr>
                     {% for item_statement in item.itemstatement_set.all %}
                         <tr>
                             <td>{{ item_statement.statement_text }}</td>
                             {% for item_option in item.itemoption_set.all %}
-                                <td><input type="radio"
+                                <td style="text-align: center"><input type="radio"
                                            name="statement_{{ item_statement.id }}">
                                 </td>
                             {% endfor %}
@@ -104,13 +112,4 @@
     <script>
         hideSpinner()
     </script>
-    <style>
-        .item-hdr {
-            font-size: small;
-        }
-        .item-input {
-            background-color: skyblue;
-            padding: 6px;
-        }
-    </style>
 {% endblock %}

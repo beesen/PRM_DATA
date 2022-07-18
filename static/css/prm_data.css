@@ -1,3 +1,36 @@
 #my_spinner {
     color: red;
 }
+
+.item-info {
+    font-size: small;
+}
+
+.item-input {
+    background-color: antiquewhite;
+    padding: 16px;
+    border: 1px solid gainsboro;
+    box-shadow: 4px 8px gainsboro;
+}
+
+.nav {
+    padding-bottom: 16px;
+    padding-top: 16px;
+}
+
+.content {
+    padding: 16px;
+    background-color: azure;
+    border: 1px solid gainsboro;
+}
+
+.container {
+    padding-left: 16px;
+    padding-right: 16px;
+    margin: 0;
+    max-width: unset;
+}
+
+hr {
+    color: gainsboro;
+}
